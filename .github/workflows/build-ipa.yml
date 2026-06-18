@@ -25,8 +25,9 @@ jobs:
           # Create temporary folder for build
           mkdir build
           # Convert Chrome Extension to Safari Web Extension Xcode Project
-          # Path to extension is passed as the first argument, and we use absolute paths
-          xcrun safari-web-extension-converter "$GITHUB_WORKSPACE" --non-interactive --copy-resources --project-location "$GITHUB_WORKSPACE/build"
+          # Path to extension is passed as the first argument. We provide all configuration options
+          # explicitly to run non-interactively without the invalid --non-interactive flag.
+          xcrun safari-web-extension-converter "$GITHUB_WORKSPACE" --copy-resources --project-location "$GITHUB_WORKSPACE/build" --app-name "CookieLoader" --bundle-identifier "com.curls1337.cookieloader" --swift
 
       - name: Build Xcode Project (Unsigned)
         run: |
