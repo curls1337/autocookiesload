@@ -17,8 +17,8 @@ jobs:
           # Create temporary folder for build
           mkdir build
           # Convert Chrome Extension to Safari Web Extension Xcode Project
-          # We specify the output directory inside build
-          xcrun safari-web-extension-converter . --non-interactive --copy-resources --project-location build
+          # We specify the output directory inside build and pass the workspace path at the end
+          xcrun safari-web-extension-converter --non-interactive --copy-resources --project-location build "$GITHUB_WORKSPACE"
 
       - name: Build Xcode Project (Unsigned)
         run: |
