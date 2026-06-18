@@ -592,8 +592,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
       chrome.cookies.set(details, (result) => {
         if (chrome.runtime.lastError) {
-          console.warn(`Failed setting cookie ${cookie.name} for ${url}:`, chrome.runtime.lastError.message);
-          resolve(false);
+          console.warn(`Failed setting cookie ${cookie.name} with expirationDate:`, chrome.runtime.lastError.message);
+          
+          // Fallback untuk Bug Safari 18: Ulangi tanpa expirationDate (sebagai session cookie)
+          const fallbackDetails = { ...details };
+          delete fallbackDetails.expirationDate;
+          
+          chrome.cookies.set(fallbackDetails, (fallbackResult) => {
+            if (chrome.runtime.lastError) {
+              console.error(`Failed fallback for cookie ${cookie.name}:`, chrome.runtime.lastError.message);
+              resolve(false);
+            } else {
+              resolve(true);
+            }
+          });
         } else {
           resolve(true);
         }
