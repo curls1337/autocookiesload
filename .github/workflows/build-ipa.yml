@@ -12,13 +12,21 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
+      - name: Debug Workspace
+        run: |
+          echo "Current Working Directory:"
+          pwd
+          echo "Files in Workspace:"
+          ls -la
+          echo "Workspace Env Path: $GITHUB_WORKSPACE"
+
       - name: Convert to Safari Web Extension
         run: |
           # Create temporary folder for build
           mkdir build
           # Convert Chrome Extension to Safari Web Extension Xcode Project
-          # We specify the output directory inside build and pass the workspace path at the end
-          xcrun safari-web-extension-converter --non-interactive --copy-resources --project-location build "$GITHUB_WORKSPACE"
+          # Path to extension is passed as the first argument, and we use absolute paths
+          xcrun safari-web-extension-converter "$GITHUB_WORKSPACE" --non-interactive --copy-resources --project-location "$GITHUB_WORKSPACE/build"
 
       - name: Build Xcode Project (Unsigned)
         run: |
