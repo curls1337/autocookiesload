@@ -1,0 +1,57 @@
+name: Build iOS Safari Extension IPA
+
+on:
+  push:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-14
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Convert to Safari Web Extension
+        run: |
+          # Create temporary folder for build
+          mkdir build
+          # Convert Chrome Extension to Safari Web Extension Xcode Project
+          # We specify the output directory inside build
+          xcrun safari-web-extension-converter . --non-interactive --copy-resources --project-location build
+
+      - name: Build Xcode Project (Unsigned)
+        run: |
+          # Find the xcodeproj file name
+          PROJECT_PATH=$(find build -name "*.xcodeproj" | head -n 1)
+          PROJECT_NAME=$(basename "$PROJECT_PATH" .xcodeproj)
+          echo "Project Path: $PROJECT_PATH"
+          echo "Project Name: $PROJECT_NAME"
+          
+          # Run archive build for iOS Device, bypassing code signing
+          xcodebuild archive \
+            -project "$PROJECT_PATH" \
+            -scheme "$PROJECT_NAME (iOS)" \
+            -configuration Release \
+            -sdk iphoneos \
+            -archivePath build/Archive.xcarchive \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGN_IDENTITY="" \
+            PROVISIONING_PROFILE_REQUIRED=NO \
+            AD_HOC_CODE_SIGNING_ALLOWED=YES
+
+      - name: Package IPA
+        run: |
+          # Package the .app bundle inside xarchive into a Payload zip (.ipa)
+          mkdir -p build/Payload
+          cp -r build/Archive.xcarchive/Products/Applications/*.app build/Payload/
+          cd build
+          zip -r "CookieLoader_Unsigned.ipa" Payload
+          echo "IPA Package created successfully."
+
+      - name: Upload IPA Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: CookieLoader-iOS-Unsigned-IPA
+          path: build/CookieLoader_Unsigned.ipa

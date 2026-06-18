@@ -1,0 +1,13 @@
+# Local cookie files and directories (Ignore to prevent leaking premium credentials)
+*.txt
+Netflix Cookies Premium @codex_update/
+
+# macOS files
+.DS_Store
+
+# Temporary build outputs
+build/
+*.xcarchive
+*.ipa
+dist/
+node_modules/
