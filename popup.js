@@ -20,6 +20,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // Application State
   let allProfiles = [];
   let activeProfileId = null;
+  let lastCookieError = '';
 
   // Initialize
   loadStateFromStorage();
@@ -467,6 +468,8 @@ document.addEventListener('DOMContentLoaded', () => {
     showToast(`Injecting cookies for ${profile.email}...`, 'info');
     
     try {
+      lastCookieError = '';
+      
       // 1. Clear existing cookies on target domain
       await clearCookiesForDomain(profile.domain);
       
@@ -478,8 +481,19 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       console.log(`Set ${setSuccessCount} of ${profile.cookies.length} cookies.`);
+      
+      if (setSuccessCount === 0) {
+        showToast(`Failed: ${lastCookieError || 'No cookies could be written.'} Check Safari permissions.`, 'error');
+        return;
+      }
+
       setActiveProfile(profile.id);
-      showToast(`Active: ${profile.email}! Cookies injected.`, 'success');
+      
+      if (setSuccessCount < profile.cookies.length) {
+        showToast(`Warning: Only set ${setSuccessCount}/${profile.cookies.length} cookies. Error: ${lastCookieError}`, 'error');
+      } else {
+        showToast(`Active: ${profile.email}! Cookies injected.`, 'success');
+      }
 
       // 3. Open or reload the tab
       openOrRefreshTargetTab(profile.domain);
@@ -592,7 +606,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
       chrome.cookies.set(details, (result) => {
         if (chrome.runtime.lastError) {
-          console.warn(`Failed setting cookie ${cookie.name} with expirationDate:`, chrome.runtime.lastError.message);
+          const firstErr = chrome.runtime.lastError.message;
+          console.warn(`Failed setting cookie ${cookie.name} with expirationDate:`, firstErr);
           
           // Fallback untuk Bug Safari 18: Ulangi tanpa expirationDate (sebagai session cookie)
           const fallbackDetails = { ...details };
@@ -600,7 +615,8 @@ document.addEventListener('DOMContentLoaded', () => {
           
           chrome.cookies.set(fallbackDetails, (fallbackResult) => {
             if (chrome.runtime.lastError) {
-              console.error(`Failed fallback for cookie ${cookie.name}:`, chrome.runtime.lastError.message);
+              lastCookieError = chrome.runtime.lastError.message;
+              console.error(`Failed fallback for cookie ${cookie.name}:`, lastCookieError);
               resolve(false);
             } else {
               resolve(true);
