@@ -22,45 +22,41 @@ jobs:
 
       - name: Convert to Safari Web Extension
         run: |
-          # Create temporary folder for build
-          mkdir build
-          # Convert Chrome Extension to Safari Web Extension Xcode Project
-          # Path to extension is passed as the first argument. We provide all configuration options
-          # explicitly to run non-interactively without the invalid --non-interactive flag.
-          xcrun safari-web-extension-converter "$GITHUB_WORKSPACE" --copy-resources --project-location "$GITHUB_WORKSPACE/build" --app-name "CookieLoader" --bundle-identifier "com.curls1337.cookieloader" --swift
+          # Buat folder bersih untuk memisahkan file ekstensi dari folder build Xcode
+          mkdir -p extension_src
+          cp manifest.json extension_src/
+          cp popup.html extension_src/
+          cp popup.css extension_src/
+          cp popup.js extension_src/
+          cp background.js extension_src/
+          cp -r icons extension_src/
+          
+          # Konversi ekstensi menggunakan folder bersih sebagai input
+          xcrun safari-web-extension-converter --bundle-identifier "com.curls1337.cookieloader" --app-name "CookieLoader" --ios-only --copy-resources --no-open extension_src
 
       - name: Build Xcode Project (Unsigned)
         run: |
-          # Find the xcodeproj file name
-          PROJECT_PATH=$(find build -name "*.xcodeproj" | head -n 1)
-          PROJECT_NAME=$(basename "$PROJECT_PATH" .xcodeproj)
-          echo "Project Path: $PROJECT_PATH"
-          echo "Project Name: $PROJECT_NAME"
-          
-          # Run archive build for iOS Device, bypassing code signing
-          xcodebuild archive \
-            -project "$PROJECT_PATH" \
-            -scheme "$PROJECT_NAME (iOS)" \
-            -configuration Release \
-            -sdk iphoneos \
-            -archivePath build/Archive.xcarchive \
-            CODE_SIGNING_ALLOWED=NO \
-            CODE_SIGNING_REQUIRED=NO \
-            CODE_SIGN_IDENTITY="" \
-            PROVISIONING_PROFILE_REQUIRED=NO \
-            AD_HOC_CODE_SIGNING_ALLOWED=YES
+          # Mengompilasi proyek menjadi aplikasi iOS (.app) tanpa code signing ke folder build lokal dengan target iOS 15.0
+          xcodebuild -project CookieLoader/CookieLoader.xcodeproj \
+                     -scheme "CookieLoader" \
+                     -sdk iphoneos \
+                     -configuration Release \
+                     SYMROOT=$PWD/build \
+                     IPHONEOS_DEPLOYMENT_TARGET=15.0 \
+                     CODE_SIGNING_ALLOWED=NO \
+                     CODE_SIGNING_REQUIRED=NO \
+                     clean build
 
       - name: Package IPA
         run: |
-          # Package the .app bundle inside xarchive into a Payload zip (.ipa)
-          mkdir -p build/Payload
-          cp -r build/Archive.xcarchive/Products/Applications/*.app build/Payload/
-          cd build
-          zip -r "CookieLoader_Unsigned.ipa" Payload
+          # Membuat folder Payload untuk membungkus .app menjadi .ipa
+          mkdir -p Payload
+          cp -r build/Release-iphoneos/CookieLoader.app Payload/
+          zip -r "CookieLoader_Unsigned.ipa" Payload/
           echo "IPA Package created successfully."
 
       - name: Upload IPA Artifact
         uses: actions/upload-artifact@v4
         with:
           name: CookieLoader-iOS-Unsigned-IPA
-          path: build/CookieLoader_Unsigned.ipa
+          path: CookieLoader_Unsigned.ipa
