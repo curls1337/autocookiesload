@@ -116,6 +116,34 @@ document.addEventListener('DOMContentLoaded', () => {
     // Global Actions
     btnClearCookies.addEventListener('click', handleClearCookies);
     btnDeleteAll.addEventListener('click', handleDeleteAll);
+
+    // Tab Switching
+    const tabButtons = document.querySelectorAll('.tab-btn');
+    const tabContents = document.querySelectorAll('.tab-content');
+
+    tabButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const target = btn.dataset.target;
+        
+        tabButtons.forEach(b => b.classList.remove('active'));
+        tabContents.forEach(c => {
+          c.style.display = 'none';
+          c.classList.remove('active-content');
+        });
+        
+        btn.classList.add('active');
+        const targetContent = document.getElementById(target);
+        targetContent.style.display = 'flex';
+        targetContent.classList.add('active-content');
+      });
+    });
+
+    // Manual Paste Actions
+    const btnPasteSave = document.getElementById('btn-paste-save');
+    const btnPasteInject = document.getElementById('btn-paste-inject');
+
+    btnPasteSave.addEventListener('click', handlePasteSave);
+    btnPasteInject.addEventListener('click', handlePasteInject);
   }
 
   // --- File Processing & Parsing ---
@@ -548,6 +576,107 @@ document.addEventListener('DOMContentLoaded', () => {
         renderProfiles();
         showToast('All saved profiles cleared.', 'success');
       });
+    }
+  }
+
+  function handlePasteSave() {
+    const text = document.getElementById('paste-input').value.trim();
+    const nameInput = document.getElementById('paste-name').value.trim();
+
+    if (!text) {
+      showToast('Please paste cookie data first.', 'error');
+      return;
+    }
+
+    const parsed = parseCookieFile(text, nameInput ? `${nameInput}.txt` : '');
+    
+    if (parsed && parsed.cookies && parsed.cookies.length > 0) {
+      const existingIndex = allProfiles.findIndex(p => p.email === parsed.metadata.email);
+      const profileData = {
+        id: parsed.metadata.email || `profile_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`,
+        email: parsed.metadata.email,
+        country: parsed.metadata.country || 'US',
+        plan: parsed.metadata.plan || 'Premium',
+        profileName: parsed.metadata.profileName || 'Manual Paste',
+        domain: parsed.metadata.domain,
+        cookies: parsed.cookies,
+        importDate: Date.now(),
+        fileName: nameInput ? `${nameInput}.txt` : 'manual_paste.txt'
+      };
+
+      if (existingIndex > -1) {
+        allProfiles[existingIndex] = profileData;
+      } else {
+        allProfiles.push(profileData);
+      }
+      
+      saveProfilesToStorage();
+      showToast('Profile saved successfully!', 'success');
+      
+      // Clear inputs
+      document.getElementById('paste-input').value = '';
+      document.getElementById('paste-name').value = '';
+      
+      // Switch back to profiles tab
+      document.querySelector('[data-target="tab-profiles"]').click();
+    } else {
+      showToast('Failed to parse cookies. Check format.', 'error');
+    }
+  }
+
+  async function handlePasteInject() {
+    const text = document.getElementById('paste-input').value.trim();
+    const nameInput = document.getElementById('paste-name').value.trim();
+
+    if (!text) {
+      showToast('Please paste cookie data first.', 'error');
+      return;
+    }
+
+    const parsed = parseCookieFile(text, nameInput ? `${nameInput}.txt` : '');
+    
+    if (parsed && parsed.cookies && parsed.cookies.length > 0) {
+      showToast(`Injecting ${parsed.cookies.length} cookies...`, 'info');
+      
+      try {
+        lastCookieError = '';
+        
+        // 1. Clear existing cookies on target domain
+        await clearCookiesForDomain(parsed.metadata.domain);
+        
+        // 2. Set all new cookies
+        let setSuccessCount = 0;
+        for (const cookie of parsed.cookies) {
+          const success = await injectCookie(cookie);
+          if (success) setSuccessCount++;
+        }
+
+        console.log(`Set ${setSuccessCount} of ${parsed.cookies.length} cookies.`);
+        
+        if (setSuccessCount === 0) {
+          showToast(`Failed: ${lastCookieError || 'No cookies could be written.'} Check Safari permissions.`, 'error');
+          return;
+        }
+
+        if (setSuccessCount < parsed.cookies.length) {
+          showToast(`Warning: Only set ${setSuccessCount}/${parsed.cookies.length} cookies. Error: ${lastCookieError}`, 'error');
+        } else {
+          showToast(`Success! Injected ${setSuccessCount} cookies.`, 'success');
+        }
+
+        // Clear inputs
+        document.getElementById('paste-input').value = '';
+        document.getElementById('paste-name').value = '';
+
+        // 3. Open or reload the tab
+        openOrRefreshTargetTab(parsed.metadata.domain);
+
+      } catch (error) {
+        console.error('Failed loading pasted cookies:', error);
+        showToast(`Error injecting cookies: ${error.message}`, 'error');
+      }
+    } else {
+      showToast('Failed to parse cookies. Check format.', 'error');
     }
   }
 

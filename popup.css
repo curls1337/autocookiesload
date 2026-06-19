@@ -621,3 +621,127 @@ body {
     box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
   }
 }
+
+/* Tabs Styling */
+.tabs-header {
+  display: flex;
+  gap: 10px;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 12px;
+  margin-bottom: 4px;
+}
+
+.tab-btn {
+  background: transparent;
+  border: 1px solid transparent;
+  font-family: var(--font-display);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 6px 14px;
+  border-radius: 8px;
+  transition: var(--transition);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.tab-btn:hover {
+  color: var(--text-main);
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.tab-btn.active {
+  color: var(--accent);
+  background: rgba(12, 224, 196, 0.05);
+  border-color: rgba(12, 224, 196, 0.2);
+  box-shadow: var(--shadow-accent);
+}
+
+.tab-content {
+  display: none;
+  flex-direction: column;
+  gap: 14px;
+  flex: 1;
+  min-height: 0;
+}
+
+.tab-content.active-content {
+  display: flex;
+}
+
+/* Paste Container Styling */
+.paste-container {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  height: 100%;
+}
+
+.input-label {
+  font-size: 9px;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-top: 4px;
+}
+
+#paste-input {
+  width: 100%;
+  height: 220px;
+  background: rgba(255, 255, 255, 0.01);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 12px;
+  color: var(--text-main);
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 10px;
+  line-height: 1.4;
+  resize: none;
+  outline: none;
+  transition: var(--transition);
+}
+
+#paste-input:focus {
+  border-color: var(--border-active);
+  background: rgba(130, 71, 229, 0.02);
+  box-shadow: var(--shadow-neon);
+}
+
+.paste-input-wrapper input {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.01);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 8px 12px;
+  color: var(--text-main);
+  font-family: inherit;
+  font-size: 12px;
+  outline: none;
+  transition: var(--transition);
+}
+
+.paste-input-wrapper input:focus {
+  border-color: var(--border-active);
+  box-shadow: var(--shadow-neon);
+}
+
+.paste-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: auto;
+  padding-top: 10px;
+}
+
+.btn-primary {
+  background: var(--primary);
+  color: var(--text-main);
+  border-color: var(--primary);
+}
+
+.btn-primary:hover {
+  background: var(--primary-light);
+  box-shadow: var(--shadow-neon);
+}
+

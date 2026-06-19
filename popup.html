@@ -43,65 +43,102 @@
 
     <!-- Main Content -->
     <main class="app-body">
-      <!-- Import Zone -->
-      <div class="drop-zone" id="drop-zone">
-        <input type="file" id="file-input" multiple accept=".txt" style="display: none;">
-        <svg class="upload-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M12 16.5V9.75m0 0l3 3m-3-3l-3 3M6.75 19.5a4.5 4.5 0 01-1.41-8.775 5.25 5.25 0 0110.233-2.33 3 3 0 013.758 3.848A3.752 3.752 0 0118 19.5H6.75z" />
-        </svg>
-        <div class="drop-text">
-          <p class="primary-text">Drag & Drop Cookie Files</p>
-          <p class="secondary-text">or <span class="highlight">browse files</span> (.txt)</p>
-        </div>
+      <!-- Tab Selector -->
+      <div class="tabs-header">
+        <button class="tab-btn active" data-target="tab-profiles">Profiles</button>
+        <button class="tab-btn" data-target="tab-paste">Manual Paste</button>
       </div>
 
-      <!-- Toolbar Controls -->
-      <div class="toolbar">
-        <div class="search-box">
-          <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <circle cx="11" cy="11" r="8" />
-            <line x1="21" y1="21" x2="16.65" y2="16.65" />
+      <!-- Tab 1: Profiles -->
+      <div id="tab-profiles" class="tab-content active-content">
+        <!-- Import Zone -->
+        <div class="drop-zone" id="drop-zone">
+          <input type="file" id="file-input" multiple accept=".txt" style="display: none;">
+          <svg class="upload-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 16.5V9.75m0 0l3 3m-3-3l-3 3M6.75 19.5a4.5 4.5 0 01-1.41-8.775 5.25 5.25 0 0110.233-2.33 3 3 0 013.758 3.848A3.752 3.752 0 0118 19.5H6.75z" />
           </svg>
-          <input type="text" id="search-input" placeholder="Search profiles, plans, emails...">
+          <div class="drop-text">
+            <p class="primary-text">Drag & Drop Cookie Files</p>
+            <p class="secondary-text">or <span class="highlight">browse files</span> (.txt)</p>
+          </div>
         </div>
 
-        <div class="filter-box">
-          <select id="country-filter">
-            <option value="">All Countries</option>
-          </select>
-        </div>
-      </div>
-
-      <!-- Action Buttons Row -->
-      <div class="action-bar">
-        <button class="btn btn-secondary flex-btn" id="btn-clear-cookies" title="Delete current site cookies">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
-          </svg>
-          Clear Cookies
-        </button>
-        <button class="btn btn-danger flex-btn" id="btn-delete-all" title="Clear all saved profiles from storage">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-          </svg>
-          Clear Storage
-        </button>
-      </div>
-
-      <!-- List Container -->
-      <div class="list-wrapper">
-        <div class="list-header">
-          <span>Cookie Profiles</span>
-          <span class="count-indicator" id="visible-count">0 showing</span>
-        </div>
-        <div class="profile-list" id="profile-list">
-          <!-- Profiles dynamically populated here -->
-          <div class="empty-state" id="empty-state">
-            <svg class="empty-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z" />
+        <!-- Toolbar Controls -->
+        <div class="toolbar">
+          <div class="search-box">
+            <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="11" cy="11" r="8" />
+              <line x1="21" y1="21" x2="16.65" y2="16.65" />
             </svg>
-            <p class="empty-primary">No Profiles Loaded</p>
-            <p class="empty-secondary">Import cookie text files using the drag zone above to get started.</p>
+            <input type="text" id="search-input" placeholder="Search profiles, plans, emails...">
+          </div>
+
+          <div class="filter-box">
+            <select id="country-filter">
+              <option value="">All Countries</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Action Buttons Row -->
+        <div class="action-bar">
+          <button class="btn btn-secondary flex-btn" id="btn-clear-cookies" title="Delete current site cookies">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
+            </svg>
+            Clear Cookies
+          </button>
+          <button class="btn btn-danger flex-btn" id="btn-delete-all" title="Clear all saved profiles from storage">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+            </svg>
+            Clear Storage
+          </button>
+        </div>
+
+        <!-- List Container -->
+        <div class="list-wrapper">
+          <div class="list-header">
+            <span>Cookie Profiles</span>
+            <span class="count-indicator" id="visible-count">0 showing</span>
+          </div>
+          <div class="profile-list" id="profile-list">
+            <!-- Profiles dynamically populated here -->
+            <div class="empty-state" id="empty-state">
+              <svg class="empty-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z" />
+              </svg>
+              <p class="empty-primary">No Profiles Loaded</p>
+              <p class="empty-secondary">Import cookie text files using the drag zone above to get started.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab 2: Manual Paste -->
+      <div id="tab-paste" class="tab-content" style="display: none;">
+        <div class="paste-container">
+          <span class="input-label">Pasted Cookie Data (Netscape or JSON)</span>
+          <textarea id="paste-input" placeholder="Paste tab-separated Netscape format cookie lines here...&#10;Example:&#10;.netflix.com   TRUE    /   FALSE   1780761903  nfvdid  BQFmAAE..."></textarea>
+          
+          <span class="input-label">Account Name / Email (Optional)</span>
+          <div class="paste-input-wrapper">
+            <input type="text" id="paste-name" placeholder="E.g., Netflix Premium Account, or leave blank to auto-detect">
+          </div>
+          
+          <div class="paste-actions">
+            <button class="btn btn-secondary flex-btn" id="btn-paste-save" title="Save cookies to profiles list">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+              </svg>
+              Save Profile
+            </button>
+            <button class="btn btn-primary flex-btn" id="btn-paste-inject" title="Directly inject and open website">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+              </svg>
+              Inject & Load
+            </button>
           </div>
         </div>
       </div>
